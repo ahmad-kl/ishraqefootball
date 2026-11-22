@@ -49,7 +49,7 @@ header p{font-size:11px;color:#a991bd;margin-top:5px}
 .match{padding:13px;background:#120b1c;border:1px solid #39234d;border-radius:10px;margin-top:10px}
 .match-head{display:flex;justify-content:space-between;gap:8px;color:#bda5d3;font-size:11px;margin-bottom:10px}
 .scoreline{display:grid;grid-template-columns:1fr 55px 15px 55px 1fr;gap:6px;align-items:center;text-align:center}
-.scoreline .name{font-size:12px;overflow-wrap:anywhere; display:flex; align-items:center; justify-content:center; gap:5px;}
+.scoreline .name{font-size:12px;overflow-wrap:anywhere;display:flex;align-items:center;justify-content:center;gap:5px}
 .scoreline input{width:100%;text-align:center;padding:9px 3px;background:#211331;border:1px solid #67408b;border-radius:7px;color:white}
 .scoreline .vs{color:#a68bbd;font-size:11px}
 .match-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
@@ -63,8 +63,13 @@ td:first-child,th:first-child{text-align:left}
 label{display:block;color:#c5afd9;font-size:11px;margin:10px 0 4px}
 textarea.field{resize:vertical}
 .footer{text-align:center;color:#766187;font-size:11px;padding:20px 0}
-.avatar-img{width:30px; height:30px; border-radius:50%; object-fit:cover; border:1px solid #583477;}
-@media(max-width:650px){.app{padding:13px}.stats{grid-template-columns:1fr 1fr}.scoreline{grid-template-columns:minmax(0,1fr) 43px 12px 43px minmax(0,1fr)}.scoreline .name{font-size:10px}}
+.avatar-img{width:30px;height:30px;border-radius:50%;object-fit:cover;border:1px solid #583477}
+@media(max-width:650px){
+.app{padding:13px}
+.stats{grid-template-columns:1fr 1fr}
+.scoreline{grid-template-columns:minmax(0,1fr) 43px 12px 43px minmax(0,1fr)}
+.scoreline .name{font-size:10px}
+}
 </style>
 </head>
 <body>
@@ -130,10 +135,10 @@ let awards = {};
 let currentTab = "overview";
 let attached = false;
 
-/* ---------- HELPER: DEFAULT AVATAR ---------- */
-const getAvatar = (name, logo) => logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=4c1d95&color=fff`;
+const getAvatar = (name, logo) =>
+  logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=4c1d95&color=fff`;
 
-/* ---------- AUTH ---------- */
+/* AUTH */
 onAuthStateChanged(auth, user => {
   if (user) {
     document.getElementById("loginScreen").classList.add("hidden");
@@ -163,7 +168,7 @@ document.getElementById("loginForm").addEventListener("submit", async e => {
 
 document.getElementById("logout").onclick = () => signOut(auth);
 
-/* ---------- NAV ---------- */
+/* NAVIGATION */
 window.goTab = (t) => {
   currentTab = t;
   document.querySelectorAll("#navigation button").forEach(b =>
@@ -171,47 +176,57 @@ window.goTab = (t) => {
   );
   render();
 };
+
 document.getElementById("navigation").addEventListener("click", e => {
   const b = e.target.closest("button[data-tab]");
   if (b) goTab(b.dataset.tab);
 });
 
-/* ---------- LISTENERS ---------- */
+/* FIREBASE LISTENERS */
 function attachListeners() {
   if (attached) return;
   attached = true;
+
   onSnapshot(refs.players, snap => {
     players = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    render(); updateStats();
+    render();
+    updateStats();
   });
+
   onSnapshot(refs.matches, snap => {
     matches = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    render(); updateStats();
+    render();
+    updateStats();
   });
+
   onSnapshot(refs.tournament, snap => {
     info = snap.exists() ? snap.data() : {};
     render();
   });
+
   onSnapshot(refs.awards, snap => {
     awards = snap.exists() ? snap.data() : {};
     render();
   });
 }
 
-/* ---------- HELPERS ---------- */
+/* HELPERS */
 const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({
   "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
 }[c]));
+
 const pName = id => players.find(p => p.id === id)?.name || "Removed";
+
 const pLogo = id => {
   const p = players.find(p => p.id === id);
   return p ? getAvatar(p.name, p.logo) : getAvatar("TBD");
 };
 
 const leagueMatches = () => matches.filter(m => m.stage === "league");
-const playedLeague  = () => leagueMatches().filter(m => m.played);
-const totalRounds = () => players.length < 2 ? 0
-  : (players.length % 2 === 0 ? players.length - 1 : players.length);
+const playedLeague = () => leagueMatches().filter(m => m.played);
+
+const totalRounds = () => players.length < 2 ? 0 :
+  (players.length % 2 === 0 ? players.length - 1 : players.length);
 
 function updateStats() {
   document.getElementById("sPlayers").textContent = players.length;
@@ -223,21 +238,46 @@ function updateStats() {
 
 function calculateTable() {
   const rows = players.map(p => ({
-    id:p.id, name:p.name, logo:p.logo, played:0, w:0, d:0, l:0, gf:0, ga:0, gd:0, pts:0
+    id:p.id, name:p.name, logo:p.logo,
+    played:0, w:0, d:0, l:0, gf:0, ga:0, gd:0, pts:0
   }));
+
   const byId = Object.fromEntries(rows.map(r => [r.id, r]));
+
   playedLeague().forEach(m => {
     const h = byId[m.home], a = byId[m.away];
     if (!h || !a) return;
-    h.played++; a.played++;
-    h.gf += m.hg; h.ga += m.ag;
-    a.gf += m.ag; a.ga += m.hg;
-    if (m.hg > m.ag) { h.w++; h.pts += 3; a.l++; }
-    else if (m.hg < m.ag) { a.w++; a.pts += 3; h.l++; }
-    else { h.d++; a.d++; h.pts++; a.pts++; }
+
+    h.played++;
+    a.played++;
+    h.gf += m.hg;
+    h.ga += m.ag;
+    a.gf += m.ag;
+    a.ga += m.hg;
+
+    if (m.hg > m.ag) {
+      h.w++;
+      h.pts += 3;
+      a.l++;
+    } else if (m.hg < m.ag) {
+      a.w++;
+      a.pts += 3;
+      h.l++;
+    } else {
+      h.d++;
+      a.d++;
+      h.pts++;
+      a.pts++;
+    }
   });
+
   rows.forEach(r => r.gd = r.gf - r.ga);
-  rows.sort((a,b) => b.pts-a.pts || b.gd-a.gd || b.gf-a.gf || a.name.localeCompare(b.name));
+
+  rows.sort((a,b) =>
+    b.pts-a.pts || b.gd-a.gd || b.gf-a.gf ||
+    a.name.localeCompare(b.name)
+  );
+
   return rows;
 }
 
@@ -258,14 +298,22 @@ async function clearAllMatches() {
   await setDoc(refs.tournament, { generated: false }, { merge: true });
 }
 
-/* ---------- RENDER ---------- */
+/* RENDER */
 function render() {
   const map = {
-    overview: overviewHTML, players: playersHTML, fixtures: fixturesHTML,
-    table: tableHTML, playoffs: playoffsHTML, stats: statsHTML, 
-    gk: gkHTML, awards: awardsHTML, settings: settingsHTML
+    overview: overviewHTML,
+    players: playersHTML,
+    fixtures: fixturesHTML,
+    table: tableHTML,
+    playoffs: playoffsHTML,
+    stats: statsHTML,
+    gk: gkHTML,
+    awards: awardsHTML,
+    settings: settingsHTML
   };
-  document.getElementById("content").innerHTML = (map[currentTab] || overviewHTML)();
+
+  document.getElementById("content").innerHTML =
+    (map[currentTab] || overviewHTML)();
 }
 
 /* OVERVIEW */
@@ -273,6 +321,7 @@ function overviewHTML() {
   const done = playedLeague().length;
   const total = leagueMatches().length;
   const rows = calculateTable();
+
   return `
   <div class="panel">
     <h2>Welcome, Admin!</h2>
@@ -288,6 +337,7 @@ function overviewHTML() {
       <button class="btn secondary" onclick="goTab('table')">Points Table</button>
     </div>
   </div>
+
   <div class="panel">
     <h2>League Progress</h2>
     <p class="muted">${done} of ${total} completed.</p>
@@ -297,8 +347,8 @@ function overviewHTML() {
     <h3 class="section-title">Current Top 4</h3>
     ${rows.length ? rows.slice(0,4).map((r,i) => `
       <div class="item">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <img src="${getAvatar(r.name, r.logo)}" class="avatar-img">
+        <div style="display:flex;align-items:center;gap:10px">
+          <img src="${getAvatar(r.name,r.logo)}" class="avatar-img">
           <div>
             <strong>${i+1}. ${esc(r.name)}</strong>
             <small>${r.pts} pts • ${r.played} played</small>
@@ -320,11 +370,12 @@ function playersHTML() {
       <input class="field" id="newPlayerLogo" placeholder="Logo Image URL (Optional)">
       <button class="btn" onclick="addPlayer()">Add Player</button>
     </div>
+
     <div class="list">
       ${players.length ? players.map(p => `
         <div class="item">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <img src="${getAvatar(p.name, p.logo)}" class="avatar-img">
+          <div style="display:flex;align-items:center;gap:10px">
+            <img src="${getAvatar(p.name,p.logo)}" class="avatar-img">
             <div>
               <strong>${esc(p.name)}</strong>
               <small>Saves ${p.saves||0} • Assists ${p.assists||0} • MOTM ${p.motm||0}</small>
@@ -337,6 +388,7 @@ function playersHTML() {
           </div>
         </div>`).join("") : `<div class="empty">No players yet.</div>`}
     </div>
+
     <div class="row" style="margin-top:14px">
       <button class="btn green" onclick="generateLeague()">
         ${info.generated ? "Regenerate" : "Generate"} League Fixtures
@@ -350,90 +402,141 @@ window.addPlayer = async () => {
   const logoInput = document.getElementById("newPlayerLogo");
   const name = input.value.trim();
   const logo = logoInput.value.trim();
-  
+
   if (!name) return;
+
   if (players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
-    alert("Player already exists"); return;
+    alert("Player already exists");
+    return;
   }
+
   if (info.generated && !confirm("This resets all fixtures & results. Continue?")) return;
   if (info.generated) await clearAllMatches();
-  
+
   await addDoc(refs.players, {
-    name, logo: logo || null, saves: 0, assists: 0, motm: 0, createdAt: serverTimestamp()
+    name,
+    logo: logo || null,
+    saves: 0,
+    assists: 0,
+    motm: 0,
+    createdAt: serverTimestamp()
   });
+
   input.value = "";
   logoInput.value = "";
 };
 
 window.editLogo = async (id) => {
-  const p = players.find(x => x.id === id); if (!p) return;
+  const p = players.find(x => x.id === id);
+  if (!p) return;
+
   const logo = prompt("Enter Logo Image URL:", p.logo || "");
-  if (logo === null) return; // Canceled
-  await updateDoc(doc(refs.players, id), { logo: logo.trim() || null });
+  if (logo === null) return;
+
+  await updateDoc(doc(refs.players, id), {
+    logo: logo.trim() || null
+  });
 };
 
 window.renamePlayer = async (id) => {
-  const p = players.find(x => x.id === id); if (!p) return;
+  const p = players.find(x => x.id === id);
+  if (!p) return;
+
   const name = prompt("New name:", p.name);
   if (!name || !name.trim()) return;
+
   if (info.generated && !confirm("This resets fixtures. Continue?")) return;
   if (info.generated) await clearAllMatches();
-  await updateDoc(doc(refs.players, id), { name: name.trim() });
+
+  await updateDoc(doc(refs.players, id), {
+    name: name.trim()
+  });
 };
 
 window.removePlayer = async (id) => {
   if (!confirm("Remove this player?")) return;
   if (info.generated && !confirm("This resets fixtures. Continue?")) return;
   if (info.generated) await clearAllMatches();
+
   await deleteDoc(doc(refs.players, id));
 };
 
 window.generateLeague = async () => {
-  if (players.length < 2) { alert("Add at least 2 players"); return; }
+  if (players.length < 2) {
+    alert("Add at least 2 players");
+    return;
+  }
+
   if (info.generated && !confirm("Regenerate? All results will be lost.")) return;
   await clearAllMatches();
 
   const pool = players.map(p => p.id);
   if (pool.length % 2) pool.push(null);
-  const n = pool.length, rounds = n - 1, perRound = n / 2;
+
+  const n = pool.length;
+  const rounds = n - 1;
+  const perRound = n / 2;
   const list = [];
+
   for (let r = 0; r < rounds; r++) {
     for (let i = 0; i < perRound; i++) {
-      const home = pool[i], away = pool[n - 1 - i];
+      const home = pool[i];
+      const away = pool[n - 1 - i];
+
       if (home && away) {
         list.push({
-          stage: "league", round: r + 1, home, away,
-          hg: null, ag: null, played: false, winner: null
+          stage: "league",
+          round: r + 1,
+          home,
+          away,
+          hg: null,
+          ag: null,
+          played: false,
+          winner: null
         });
       }
     }
+
     pool.splice(1, 0, pool.pop());
   }
+
   for (const m of list) await addDoc(refs.matches, m);
-  await setDoc(refs.tournament, { generated: true, updatedAt: serverTimestamp() }, { merge: true });
+
+  await setDoc(refs.tournament, {
+    generated: true,
+    updatedAt: serverTimestamp()
+  }, { merge: true });
+
   alert(list.length + " fixtures generated.");
 };
 
 /* FIXTURES */
 function matchCard(m) {
   const tied = m.played && m.hg === m.ag && m.stage !== "league";
+
   return `
   <div class="match">
     <div class="match-head">
       <span>${m.stage === "league" ? "ROUND " + m.round : m.stage.toUpperCase()}</span>
       <span class="badge">${m.played ? "COMPLETED" : "PENDING"}</span>
     </div>
+
     <div class="scoreline">
       <div class="name">
-        <img src="${pLogo(m.home)}" class="avatar-img" style="width:20px;height:20px;"> ${esc(pName(m.home))}
+        <img src="${pLogo(m.home)}" class="avatar-img" style="width:20px;height:20px;">
+        ${esc(pName(m.home))}
       </div>
+
       <input type="number" min="0" id="hg-${m.id}" value="${m.hg ?? ""}" placeholder="-">
       <span class="vs">VS</span>
       <input type="number" min="0" id="ag-${m.id}" value="${m.ag ?? ""}" placeholder="-">
+
       <div class="name">
-        ${esc(pName(m.away))} <img src="${pLogo(m.away)}" class="avatar-img" style="width:20px;height:20px;">
+        ${esc(pName(m.away))}
+        <img src="${pLogo(m.away)}" class="avatar-img" style="width:20px;height:20px;">
       </div>
     </div>
+
     ${tied ? `
       <label>Winner after tie-break</label>
       <select class="field" id="winner-${m.id}">
@@ -441,6 +544,7 @@ function matchCard(m) {
         <option value="${m.home}" ${m.winner === m.home ? "selected" : ""}>${esc(pName(m.home))}</option>
         <option value="${m.away}" ${m.winner === m.away ? "selected" : ""}>${esc(pName(m.away))}</option>
       </select>` : ""}
+
     <div class="match-actions">
       <button class="btn small" onclick="saveResult('${m.id}')">Save</button>
       <button class="btn danger small" onclick="clearResult('${m.id}')">Clear</button>
@@ -451,7 +555,9 @@ function matchCard(m) {
 function fixturesHTML() {
   const lm = leagueMatches().sort((a,b) => a.round - b.round);
   const groups = {};
+
   lm.forEach(m => (groups[m.round] ||= []).push(m));
+
   return `
   <div class="panel">
     <h2>League Fixtures</h2>
@@ -463,20 +569,35 @@ function fixturesHTML() {
 }
 
 window.saveResult = async (id) => {
-  const m = matches.find(x => x.id === id); if (!m) return;
+  const m = matches.find(x => x.id === id);
+  if (!m) return;
+
   const hg = Number(document.getElementById("hg-" + id).value);
   const ag = Number(document.getElementById("ag-" + id).value);
+
   if (!Number.isInteger(hg) || !Number.isInteger(ag) || hg < 0 || ag < 0) {
-    alert("Enter valid scores"); return;
+    alert("Enter valid scores");
+    return;
   }
+
   let winner = null;
+
   if (m.stage !== "league" && hg === ag) {
     winner = document.getElementById("winner-" + id)?.value;
+
     if (winner !== m.home && winner !== m.away) {
-      alert("Select a winner for the tie-break"); return;
+      alert("Select a winner for the tie-break");
+      return;
     }
   }
-  await updateDoc(doc(refs.matches, id), { hg, ag, played: true, winner });
+
+  await updateDoc(doc(refs.matches, id), {
+    hg,
+    ag,
+    played: true,
+    winner
+  });
+
   if (id === "semi1" || id === "semi2") {
     await deleteDoc(doc(refs.matches, "final")).catch(() => {});
   }
@@ -484,34 +605,50 @@ window.saveResult = async (id) => {
 
 window.clearResult = async (id) => {
   if (!confirm("Clear this result?")) return;
+
   await updateDoc(doc(refs.matches, id), {
-    hg: null, ag: null, played: false, winner: null
+    hg: null,
+    ag: null,
+    played: false,
+    winner: null
   });
+
   if (id === "semi1" || id === "semi2") {
     await deleteDoc(doc(refs.matches, "final")).catch(() => {});
   }
 };
 
-/* TABLE */
+/* POINTS TABLE */
 function tableHTML() {
   const rows = calculateTable();
+
   return `
   <div class="panel">
     <h2>Points Table</h2>
     ${rows.length ? `
       <div class="table-wrap" style="overflow-x:auto">
         <table>
-          <thead><tr><th>#</th><th>Player</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead>
+          <thead>
+            <tr>
+              <th>#</th><th>Player</th><th>P</th><th>W</th><th>D</th>
+              <th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
+            </tr>
+          </thead>
           <tbody>
             ${rows.map((r,i) => `
               <tr>
                 <td>${i+1}</td>
-                <td class="${i<4?'top4':''}" style="display:flex; align-items:center; gap:8px; text-align:left;">
-                  <img src="${getAvatar(r.name, r.logo)}" class="avatar-img" style="width:20px;height:20px;">
+                <td style="display:flex;align-items:center;gap:8px;text-align:left">
+                  <img src="${getAvatar(r.name,r.logo)}" class="avatar-img" style="width:20px;height:20px">
                   ${esc(r.name)}
                 </td>
-                <td>${r.played}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
-                <td>${r.gf}</td><td>${r.ga}</td><td>${r.gd}</td>
+                <td>${r.played}</td>
+                <td>${r.w}</td>
+                <td>${r.d}</td>
+                <td>${r.l}</td>
+                <td>${r.gf}</td>
+                <td>${r.ga}</td>
+                <td>${r.gd}</td>
                 <td><strong>${r.pts}</strong></td>
               </tr>`).join("")}
           </tbody>
@@ -527,68 +664,127 @@ function playoffsHTML() {
   const s1 = matches.find(m => m.id === "semi1");
   const s2 = matches.find(m => m.id === "semi2");
   const fn = matches.find(m => m.id === "final");
+
   return `
   <div class="panel">
     <h2>Semi-Finals & Final</h2>
     <p class="muted">Complete all league matches first (Top 4 qualify).</p>
+
     <div class="row">
       <button class="btn green" onclick="generateSemis()">Generate Semi-Finals</button>
       <button class="btn green" onclick="generateFinal()">Generate Final</button>
     </div>
+
     <h3 class="section-title">Semi-Final 1</h3>
     ${s1 ? matchCard(s1) : `<div class="empty">Not generated.</div>`}
+
     <h3 class="section-title">Semi-Final 2</h3>
     ${s2 ? matchCard(s2) : `<div class="empty">Not generated.</div>`}
+
     <h3 class="section-title">Final</h3>
     ${fn ? matchCard(fn) : `<div class="empty">Not generated.</div>`}
   </div>`;
 }
 
 window.generateSemis = async () => {
-  if (!leagueComplete()) { alert("Complete all league matches first."); return; }
-  if (players.length < 4) { alert("At least 4 players required."); return; }
+  if (!leagueComplete()) {
+    alert("Complete all league matches first.");
+    return;
+  }
+
+  if (players.length < 4) {
+    alert("At least 4 players required.");
+    return;
+  }
+
   if (!confirm("Generate semi-finals from Top 4? Existing semis/final will be cleared.")) return;
+
   const top = calculateTable().slice(0, 4);
+
   for (const id of ["semi1", "semi2", "final"]) {
     await deleteDoc(doc(refs.matches, id)).catch(() => {});
   }
+
   await setDoc(doc(refs.matches, "semi1"), {
-    stage: "semi", round: 1, home: top[0].id, away: top[3].id,
-    hg: null, ag: null, played: false, winner: null
+    stage: "semi",
+    round: 1,
+    home: top[0].id,
+    away: top[3].id,
+    hg: null,
+    ag: null,
+    played: false,
+    winner: null
   });
+
   await setDoc(doc(refs.matches, "semi2"), {
-    stage: "semi", round: 1, home: top[1].id, away: top[2].id,
-    hg: null, ag: null, played: false, winner: null
+    stage: "semi",
+    round: 1,
+    home: top[1].id,
+    away: top[2].id,
+    hg: null,
+    ag: null,
+    played: false,
+    winner: null
   });
 };
 
 window.generateFinal = async () => {
   const w1 = winnerOf(matches.find(m => m.id === "semi1"));
   const w2 = winnerOf(matches.find(m => m.id === "semi2"));
-  if (!w1 || !w2) { alert("Complete both semis + tie-breaks."); return; }
+
+  if (!w1 || !w2) {
+    alert("Complete both semis + tie-breaks.");
+    return;
+  }
+
   if (!confirm("Generate final?")) return;
+
   await setDoc(doc(refs.matches, "final"), {
-    stage: "final", round: 1, home: w1, away: w2,
-    hg: null, ag: null, played: false, winner: null
+    stage: "final",
+    round: 1,
+    home: w1,
+    away: w2,
+    hg: null,
+    ag: null,
+    played: false,
+    winner: null
   });
 };
 
-/* PLAYER STATS (Goals, Assists, MOTM) */
+/* PLAYER STATS */
 function computeStats(playerId) {
-  const s = { goals: 0, cleanSheets: 0, conceded: 0, w: 0, d: 0, l: 0 };
+  const s = {
+    goals: 0,
+    cleanSheets: 0,
+    conceded: 0,
+    w: 0,
+    d: 0,
+    l: 0
+  };
+
   playedLeague().forEach(m => {
     if (m.home === playerId) {
       s.goals += m.hg;
       s.conceded += m.ag;
+
       if (m.ag === 0) s.cleanSheets++;
-      if (m.hg > m.ag) s.w++; else if (m.hg < m.ag) s.l++; else s.d++;
+
+      if (m.hg > m.ag) s.w++;
+      else if (m.hg < m.ag) s.l++;
+      else s.d++;
+
     } else if (m.away === playerId) {
       s.goals += m.ag;
       s.conceded += m.hg;
+
       if (m.hg === 0) s.cleanSheets++;
-      if (m.ag > m.hg) s.w++; else if (m.ag < m.hg) s.l++; else s.d++;
+
+      if (m.ag > m.hg) s.w++;
+      else if (m.ag < m.hg) s.l++;
+      else s.d++;
     }
   });
+
   return s;
 }
 
@@ -597,18 +793,21 @@ function statsHTML() {
   <div class="panel">
     <h2>Player Stats</h2>
     <p class="muted">Goals & W-D-L auto-computed. Assists / MOTM admin-entered.</p>
+
     <div class="list">
       ${players.length ? players.map(p => {
         const s = computeStats(p.id);
+
         return `
         <div class="item" style="flex-direction:column;align-items:stretch">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <img src="${getAvatar(p.name, p.logo)}" class="avatar-img">
+          <div style="display:flex;align-items:center;gap:10px">
+            <img src="${getAvatar(p.name,p.logo)}" class="avatar-img">
             <div>
               <strong>${esc(p.name)}</strong>
               <small>Goals ${s.goals} • W-D-L ${s.w}-${s.d}-${s.l}</small>
             </div>
           </div>
+
           <div class="row" style="margin-top:8px">
             <input class="field" type="number" min="0" id="assists-${p.id}" value="${p.assists||0}" placeholder="Assists">
             <input class="field" type="number" min="0" id="motm-${p.id}" value="${p.motm||0}" placeholder="MOTM">
@@ -621,18 +820,26 @@ function statsHTML() {
 }
 
 window.saveStats = async (id) => {
-  const n = key => Math.max(0, Number(document.getElementById(key + "-" + id).value) || 0);
+  const n = key => Math.max(
+    0,
+    Number(document.getElementById(key + "-" + id).value) || 0
+  );
+
   await updateDoc(doc(refs.players, id), {
-    assists: n("assists"), motm: n("motm")
+    assists: n("assists"),
+    motm: n("motm")
   });
+
   alert("Stats updated!");
 };
 
-/* BEST GK (പ്രൊഫഷണൽ അഡ്മിൻ ഡാഷ്ബോർഡ്) */
+/* BEST GK */
 function gkHTML() {
   const opts = (sel) => `
     <option value="">— None —</option>
-    ${players.map(p => `<option value="${p.id}" ${sel === p.id ? "selected" : ""}>${esc(p.name)}</option>`).join("")}`;
+    ${players.map(p =>
+      `<option value="${p.id}" ${sel === p.id ? "selected" : ""}>${esc(p.name)}</option>`
+    ).join("")}`;
 
   const sortedPlayers = [...players].map(p => {
     const s = computeStats(p.id);
@@ -644,60 +851,65 @@ function gkHTML() {
   });
 
   return `
-  <div class="panel" style="background: linear-gradient(145deg, #1d122b, #140b1e);">
-    <h2 style="display:flex; align-items:center; gap:10px;">🧤 Golden Glove Management</h2>
+  <div class="panel" style="background:linear-gradient(145deg,#1d122b,#140b1e)">
+    <h2 style="display:flex;align-items:center;gap:10px">🧤 Golden Glove Management</h2>
     <p class="muted">Clean Sheets & Goals Conceded are auto-calculated. Just select the final winner below.</p>
-    
-    <div style="background: rgba(234, 179, 8, 0.1); border: 1px solid #eab308; padding: 18px; border-radius: 12px; margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: space-between;">
+
+    <div style="background:rgba(234,179,8,.1);border:1px solid #eab308;padding:18px;border-radius:12px;margin-bottom:25px;display:flex;flex-wrap:wrap;gap:15px;align-items:center;justify-content:space-between">
       <div>
-        <h3 style="color: #facc15; margin-bottom: 5px; font-size: 16px;">🏆 Select Best GK Winner</h3>
-        <small style="color: #d8b4fe;">This will be highlighted on the public Best GK page.</small>
+        <h3 style="color:#facc15;margin-bottom:5px;font-size:16px">🏆 Select Best GK Winner</h3>
+        <small style="color:#d8b4fe">This will be highlighted on the public Best GK page.</small>
       </div>
-      <div class="row" style="flex: 1; min-width: 200px; margin: 0;">
-        <select class="field" id="aw-bestGK" style="background: #10091b; border-color: #eab308; margin: 0;">${opts(awards.bestGK)}</select>
-        <button class="btn" style="background: #eab308; color: #000; font-weight: 700;" onclick="saveBestGkAward()">Save</button>
+
+      <div class="row" style="flex:1;min-width:200px;margin:0">
+        <select class="field" id="aw-bestGK" style="background:#10091b;border-color:#eab308;margin:0">
+          ${opts(awards.bestGK)}
+        </select>
+        <button class="btn" style="background:#eab308;color:#000;font-weight:700" onclick="saveBestGkAward()">Save</button>
       </div>
     </div>
 
-    <h3 class="section-title" style="display:flex; justify-content:space-between;">
+    <h3 class="section-title" style="display:flex;justify-content:space-between">
       <span>Live Goalkeeper Stats</span>
-      <span class="badge" style="background:#392052;">Auto-Calculated</span>
+      <span class="badge">Auto-Calculated</span>
     </h3>
-    
-    <div class="table-wrap" style="overflow-x:auto; border: 1px solid #39234d; border-radius: 12px;">
-      <table style="min-width: 100%;">
+
+    <div class="table-wrap" style="overflow-x:auto;border:1px solid #39234d;border-radius:12px">
+      <table style="min-width:100%">
         <thead>
-          <tr style="background: #241535;">
-            <th style="text-align:left; padding: 15px;">Player Name</th>
-            <th style="padding: 15px;">Matches</th>
-            <th style="padding: 15px; color: #a7ffc8;">Clean Sheets</th>
-            <th style="padding: 15px; color: #ffb2c4;">Conceded</th>
+          <tr style="background:#241535">
+            <th style="text-align:left;padding:15px">Player Name</th>
+            <th style="padding:15px">Matches</th>
+            <th style="padding:15px;color:#a7ffc8">Clean Sheets</th>
+            <th style="padding:15px;color:#ffb2c4">Conceded</th>
           </tr>
         </thead>
+
         <tbody>
           ${sortedPlayers.length ? sortedPlayers.map(p => {
             const played = p.w + p.d + p.l;
+
             return `
-            <tr style="border-bottom: 1px solid #39234d; transition: background 0.2s;" onmouseover="this.style.background='#241535'" onmouseout="this.style.background='transparent'">
-              <td style="text-align:left; padding: 15px; display:flex; align-items:center; gap:8px;">
-                <img src="${getAvatar(p.name, p.logo)}" class="avatar-img" style="width:24px; height:24px;">
-                <strong style="color: ${awards.bestGK === p.id ? '#facc15' : 'white'};">
+            <tr style="border-bottom:1px solid #39234d">
+              <td style="text-align:left;padding:15px;display:flex;align-items:center;gap:8px">
+                <img src="${getAvatar(p.name,p.logo)}" class="avatar-img" style="width:24px;height:24px">
+                <strong style="color:${awards.bestGK === p.id ? '#facc15' : 'white'}">
                   ${awards.bestGK === p.id ? '👑 ' : ''}${esc(p.name)}
                 </strong>
               </td>
-              <td style="padding: 15px; color: #c9a9e9;">${played}</td>
-              <td style="padding: 15px;">
-                <span style="background: rgba(167, 255, 200, 0.1); color: #a7ffc8; padding: 4px 10px; border-radius: 20px; font-weight: bold;">
+              <td style="padding:15px;color:#c9a9e9">${played}</td>
+              <td style="padding:15px">
+                <span style="background:rgba(167,255,200,.1);color:#a7ffc8;padding:4px 10px;border-radius:20px;font-weight:bold">
                   ${p.cleanSheets}
                 </span>
               </td>
-              <td style="padding: 15px;">
-                <span style="background: rgba(255, 178, 196, 0.1); color: #ffb2c4; padding: 4px 10px; border-radius: 20px; font-weight: bold;">
+              <td style="padding:15px">
+                <span style="background:rgba(255,178,196,.1);color:#ffb2c4;padding:4px 10px;border-radius:20px;font-weight:bold">
                   ${p.conceded}
                 </span>
               </td>
             </tr>`;
-          }).join("") : `<tr><td colspan="4" class="empty" style="padding:20px;">No players added yet.</td></tr>`}
+          }).join("") : `<tr><td colspan="4" class="empty" style="padding:20px">No players added yet.</td></tr>`}
         </tbody>
       </table>
     </div>
@@ -706,26 +918,34 @@ function gkHTML() {
 
 window.saveBestGkAward = async () => {
   const bestGK = document.getElementById("aw-bestGK").value || null;
-  await setDoc(refs.awards, { bestGK: bestGK, updatedAt: serverTimestamp() }, { merge: true });
+
+  await setDoc(refs.awards, {
+    bestGK,
+    updatedAt: serverTimestamp()
+  }, { merge: true });
+
   alert("Best GK Winner saved successfully!");
 };
 
-/* AWARDS (ഗോൾഡൻ ബോൾ & ടോപ്പ് സ്കോറർ) */
+/* OTHER AWARDS */
 function awardsHTML() {
   const opts = (sel) => `
     <option value="">— None —</option>
-    ${players.map(p => `<option value="${p.id}" ${sel === p.id ? "selected" : ""}>${esc(p.name)}</option>`).join("")}`;
+    ${players.map(p =>
+      `<option value="${p.id}" ${sel === p.id ? "selected" : ""}>${esc(p.name)}</option>`
+    ).join("")}`;
+
   return `
   <div class="panel">
     <h2>Other Awards</h2>
     <p class="muted">Set winners for Golden Ball and Top Scorer.</p>
-    
+
     <label>Golden Ball (Best Player)</label>
     <select class="field" id="aw-goldenBall">${opts(awards.goldenBall)}</select>
-    
+
     <label>Top Scorer</label>
     <select class="field" id="aw-topScorer">${opts(awards.topScorer)}</select>
-    
+
     <div class="row" style="margin-top:14px">
       <button class="btn green" onclick="saveAwards()">Save Awards</button>
     </div>
@@ -738,37 +958,103 @@ window.saveAwards = async () => {
     topScorer: document.getElementById("aw-topScorer").value || null,
     updatedAt: serverTimestamp()
   }, { merge: true });
+
   alert("Awards saved.");
 };
 
-/* SETTINGS */
+/* TOURNAMENT INFORMATION - ADMIN EDITOR */
 function settingsHTML() {
   return `
   <div class="panel">
-    <h2>Tournament Info</h2>
+    <h2>General Information</h2>
+
     <label>Tournament Name</label>
     <input class="field" id="t-name" value="${esc(info.name || "Ishraq PES Tournament")}">
+
     <label>Game</label>
     <input class="field" id="t-game" value="${esc(info.game || "eFootball Mobile")}">
-    <label>Format</label>
-    <input class="field" id="t-format" value="${esc(info.format || "League + Top 4 Playoffs")}">
-    <label>Rules</label>
-    <textarea class="field" id="t-rules" rows="3">${esc(info.rules || "Win = 3 points, Draw = 1 point, Loss = 0 points.")}</textarea>
-    <div class="row" style="margin-top:14px">
-      <button class="btn green" onclick="saveInfo()">Save</button>
+
+    <label>Season</label>
+    <input class="field" id="t-season" value="${esc(info.season || "Current Season")}">
+
+    <label>Platform</label>
+    <input class="field" id="t-platform" value="${esc(info.platform || "Android / iOS")}">
+
+    <label>Tournament Status</label>
+    <input class="field" id="t-status" value="${esc(info.status || "LIVE TOURNAMENT")}">
+
+    <h3 class="section-title">Tournament Format</h3>
+    <label>Format (one item per line)</label>
+    <textarea class="field" id="t-format" rows="4">${esc(info.format || "Single Round Robin\nTop 4 qualify for semi-finals\nWinners advance to the final")}</textarea>
+
+    <h3 class="section-title">Points System</h3>
+    <div class="row">
+      <div style="flex:1;min-width:90px">
+        <label>Win Points</label>
+        <input class="field" id="t-win" type="number" min="0" value="${Number.isFinite(Number(info.pointsWin)) ? Number(info.pointsWin) : 3}">
+      </div>
+      <div style="flex:1;min-width:90px">
+        <label>Draw Points</label>
+        <input class="field" id="t-draw" type="number" min="0" value="${Number.isFinite(Number(info.pointsDraw)) ? Number(info.pointsDraw) : 1}">
+      </div>
+      <div style="flex:1;min-width:90px">
+        <label>Loss Points</label>
+        <input class="field" id="t-loss" type="number" min="0" value="${Number.isFinite(Number(info.pointsLoss)) ? Number(info.pointsLoss) : 0}">
+      </div>
     </div>
+
+    <h3 class="section-title">Match Rules</h3>
+    <label>One rule per line</label>
+    <textarea class="field" id="t-matchRules" rows="6">${esc(info.matchRules || "Players must complete their matches within the given deadline.\nBoth players should confirm the final match result.\nPlayers should submit valid match screenshots when requested.\nAny dispute should be reported to the tournament admin.\nUnfair play or cheating may lead to disqualification.")}</textarea>
+
+    <h3 class="section-title">Awards & Achievements</h3>
+    <label>One achievement per line</label>
+    <textarea class="field" id="t-achievements" rows="6">${esc(info.achievements || "Top Scorer – Highest goals scored by a player.\nBest GK – Best goalkeeper performance.\nGolden Ball – Best overall player.\nMost Goals Scored – Highest scoring team.\nMost Goals Conceded – Team that conceded the most goals.")}</textarea>
+
+    <h3 class="section-title">Tournament Support</h3>
+    <label>Organizer</label>
+    <input class="field" id="t-organizer" value="${esc(info.organizer || "Ishraq PES Tournament")}">
+
+    <label>Contact</label>
+    <input class="field" id="t-contact" value="${esc(info.contact || "Contact Tournament Admin")}">
+
+    <div class="row" style="margin-top:14px">
+      <button class="btn green" onclick="saveInfo()">Save All Tournament Information</button>
+    </div>
+
+    <p class="muted" style="margin-top:12px">
+      Saved information will update the public Tournament Info page automatically.
+    </p>
   </div>`;
 }
 
 window.saveInfo = async () => {
-  await setDoc(refs.tournament, {
-    name:   document.getElementById("t-name").value.trim(),
-    game:   document.getElementById("t-game").value.trim(),
-    format: document.getElementById("t-format").value.trim(),
-    rules:  document.getElementById("t-rules").value.trim(),
-    updatedAt: serverTimestamp()
-  }, { merge: true });
-  alert("Saved.");
+  const value = id => document.getElementById(id).value.trim();
+  const number = id => Math.max(0, Number(document.getElementById(id).value) || 0);
+
+  try {
+    await setDoc(refs.tournament, {
+      name: value("t-name"),
+      game: value("t-game"),
+      season: value("t-season"),
+      platform: value("t-platform"),
+      status: value("t-status"),
+      format: value("t-format"),
+      pointsWin: number("t-win"),
+      pointsDraw: number("t-draw"),
+      pointsLoss: number("t-loss"),
+      matchRules: value("t-matchRules"),
+      achievements: value("t-achievements"),
+      organizer: value("t-organizer"),
+      contact: value("t-contact"),
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+
+    alert("All tournament information saved successfully!");
+  } catch (error) {
+    console.error(error);
+    alert("Could not save tournament information: " + error.message);
+  }
 };
 </script>
 </body>
