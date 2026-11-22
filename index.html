@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ishraq PES Tournament</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #000;
+            color: white;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden; 
+        }
+
+        /* Mobile App Container */
+        .app-container {
+            width: 100%;
+            max-width: 430px; 
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            
+            /* ബാക്ക്ഗ്രൗണ്ട് ഇമേജ് */
+            background-image: url('https://res.cloudinary.com/dsfycdl5o/image/upload/v1795250740/bg_gm82gh.png'); 
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat;
+        }
+
+        /* Content Wrapper */
+        .content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 20px;
+        }
+
+        /* Header (Logo മാത്രം) */
+        header {
+            display: flex;
+            justify-content: flex-start; /* ഇടതുവശത്തേക്ക് മാറ്റി */
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            border: 2px solid white;
+            border-radius: 8px;
+            padding: 4px 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-text h1 {
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.1;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: #d1d5db;
+        }
+
+        /* Hero Section (Titles) */
+        .hero {
+            text-align: center;
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .main-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 46px;
+            font-weight: 700;
+            font-style: italic;
+            letter-spacing: 1px;
+            line-height: 1;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.8); 
+        }
+
+        .sub-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 20px;
+            font-weight: 500;
+            letter-spacing: 8px;
+            margin-top: 5px;
+            color: #ffffff;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+        }
+
+        /* Divider Lines */
+        .divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+            width: 100%;
+        }
+
+        .line {
+            height: 1px;
+            width: 50px;
+            background: #a855f7;
+            box-shadow: 0 0 8px #a855f7;
+        }
+
+        .efootball-logo {
+            color: #a855f7;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .community-text {
+            font-size: 13px;
+            color: #f3f4f6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        /* Buttons Section */
+        .buttons-section {
+            margin-top: auto; 
+            margin-bottom: 40px; 
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+        }
+
+        /* Ongoing Tournaments Button */
+        .btn-ongoing {
+            background: linear-gradient(135deg, #4c1d95 0%, #7e22ce 100%);
+            border: 1px solid #c084fc;
+            border-radius: 16px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: white;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4), inset 0 0 15px rgba(255,255,255,0.1);
+            transition: transform 0.2s;
+        }
+
+        .btn-ongoing:active {
+            transform: scale(0.98);
+        }
+
+        .btn-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-icon {
+            width: 35px;
+            height: 35px;
+        }
+
+        .btn-text h3 {
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.2;
+            text-align: left;
+        }
+
+        .btn-text p {
+            font-size: 12px;
+            color: #e9d5ff;
+            margin-top: 2px;
+            text-align: left;
+        }
+
+        /* Previous Tournaments Button */
+        .btn-previous {
+            background: rgba(20, 10, 30, 0.6); 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: white;
+            transition: background 0.3s;
+        }
+
+        .btn-previous:active {
+            background: rgba(40, 20, 60, 0.8);
+        }
+
+        .btn-previous .btn-text p {
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <div class="content">
+            <!-- Header (ഇവിടെ നിന്നും 3 വരകൾ കളഞ്ഞു) -->
+            <header>
+                <div class="logo-area">
+                    <div class="logo-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Ishraq PES</h1>
+                        <p>Tournament</p>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Titles -->
+            <div class="hero">
+                <h1 class="main-title">ISHRAQ PES</h1>
+                <h2 class="sub-title">TOURNAMENT</h2>
+
+                <!-- Divider -->
+                <div class="divider">
+                    <div class="line"></div>
+                    <div class="efootball-logo">e</div>
+                    <div class="line"></div>
+                </div>
+
+                <div class="community-text">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                    </svg>
+                    eFootball Mobile Community Tournament
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="buttons-section">
+                
+                <!-- Ongoing Tournaments -->
+                <a href="ongoing.html" class="btn-ongoing">
+                    <div class="btn-content">
+                        <div class="btn-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                                <path d="M4 22h16"></path>
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+                            </svg>
+                        </div>
+                        <div class="btn-text">
+                            <h3>Ongoing<br>Tournaments</h3>
+                            <p>View current active tournament</p>
+                        </div>
+                    </div>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </a>
+
+                <!-- Previous Tournaments -->
+                <a href="#" class="btn-previous">
+                    <div class="btn-content">
+                        <div class="btn-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
+                        <div class="btn-text">
+                            <h3>Previous<br>Tournaments</h3>
+                            <p>Explore completed tournaments</p>
+                        </div>
+                    </div>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </a>
+
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

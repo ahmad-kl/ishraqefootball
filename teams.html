@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teams | Ishraq PES Tournament</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    color: white;
+    min-height: 100vh;
+    /* ബാക്ക്ഗ്രൗണ്ട് ഇമേജ് */
+    background:
+        linear-gradient(rgba(12,5,28,.88),rgba(12,5,28,.96)),
+        url("https://res.cloudinary.com/dsfycdl5o/image/upload/v1795253975/Neon_Purple_Stadium_Glow_quidcw.png") center/cover fixed;
+    padding: 18px 14px 35px;
+}
+
+.container {
+    max-width: 430px;
+    margin: auto;
+}
+
+.back {
+    display: inline-block;
+    color: #d8b5ff;
+    text-decoration: none;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.hero {
+    text-align: center;
+    padding: 28px 15px;
+    border: 1px solid #873cff;
+    border-radius: 18px;
+    background: linear-gradient(135deg,#35105f,#170b30);
+    box-shadow: 0 0 22px #782cff55;
+    margin-bottom: 20px;
+}
+
+.hero .icon {
+    font-size: 42px;
+}
+
+.hero h1 {
+    font-size: 25px;
+    margin: 10px 0 7px;
+    color: #e6caff;
+}
+
+.hero p {
+    font-size: 12px;
+    color: #c7b5df;
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat {
+    background: #211139;
+    border: 1px solid #6230a0;
+    border-radius: 13px;
+    padding: 15px;
+    text-align: center;
+}
+
+.stat span {
+    display: block;
+    color: #bba3d9;
+    font-size: 11px;
+    margin-bottom: 7px;
+}
+
+.stat strong {
+    font-size: 23px;
+    color: #d9aaff;
+}
+
+.search {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #6230a0;
+    border-radius: 11px;
+    outline: none;
+    background: #211139;
+    color: white;
+    font-size: 14px;
+    margin-bottom: 17px;
+}
+
+.search::placeholder {
+    color: #a48abf;
+}
+
+.section-title {
+    font-size: 16px;
+    margin-bottom: 13px;
+    color: #e5caff;
+}
+
+.teams-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.team-card {
+    background: linear-gradient(145deg,#291443,#180d2a);
+    border: 1px solid #593080;
+    border-radius: 14px;
+    padding: 17px 10px;
+    text-align: center;
+    box-shadow: 0 0 12px #54208022;
+}
+
+.team-avatar {
+    width: 53px;
+    height: 53px;
+    margin: 0 auto 11px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg,#9c4dff,#47158a);
+    border: 2px solid #c18aff;
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+}
+
+.team-card h3 {
+    font-size: 14px;
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.team-card small {
+    color: #b49acb;
+    font-size: 10px;
+}
+
+.team-number {
+    display: inline-block;
+    margin-top: 10px;
+    background: #49206f;
+    color: #e6caff;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+}
+
+.empty {
+    text-align: center;
+    color: #bba3d9;
+    padding: 25px;
+    grid-column: 1 / -1;
+    font-size: 13px;
+}
+
+.note {
+    text-align: center;
+    color: #907ba9;
+    font-size: 11px;
+    margin-top: 23px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<a href="ongoing.html" class="back">← Back to Dashboard</a>
+
+<div class="hero">
+    <div class="icon">🏆</div>
+    <h1>TOURNAMENT TEAMS</h1>
+    <p>Meet all participants of Ishraq PES Tournament</p>
+</div>
+
+<div class="summary">
+    <div class="stat">
+        <span>TOTAL PLAYERS</span>
+        <strong id="totalPlayers">0</strong>
+    </div>
+    <div class="stat">
+        <span>TOURNAMENT</span>
+        <strong>LIVE</strong>
+    </div>
+</div>
+
+<input
+    type="text"
+    class="search"
+    id="searchInput"
+    placeholder="🔍 Search player..."
+>
+
+<h2 class="section-title">⚽ All Participants</h2>
+
+<!-- ഇവിടെയാണ് പ്ലെയർമാരെ ഡൈനാമിക് ആയി ലോഡ് ചെയ്യുന്നത് -->
+<div class="teams-grid" id="teamsGrid">
+    <div class="empty">Loading players...</div>
+</div>
+
+<p class="note">ISHRAQ PES TOURNAMENT</p>
+
+</div>
+
+<!-- FIREBASE SCRIPT -->
+<script type="module">
+    import { refs, onSnapshot } from "./firebase.js";
+
+    const teamsGrid = document.getElementById("teamsGrid");
+    const searchInput = document.getElementById("searchInput");
+    const totalPlayersEl = document.getElementById("totalPlayers");
+
+    let players = [];
+    let searchQuery = "";
+
+    // ഡാറ്റാബേസിൽ നിന്ന് പ്ലെയർമാരെ ലോഡ് ചെയ്യുക
+    onSnapshot(refs.players, snap => {
+        players = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        
+        // ടോട്ടൽ പ്ലെയർമാരുടെ എണ്ണം അപ്ഡേറ്റ് ചെയ്യുക
+        totalPlayersEl.textContent = players.length;
+        
+        renderTeams();
+    });
+
+    // സെർച്ച് ബോക്സിൽ ടൈപ്പ് ചെയ്യുമ്പോൾ
+    searchInput.addEventListener("input", function () {
+        searchQuery = this.value.toLowerCase().trim();
+        renderTeams();
+    });
+
+    // പ്ലെയർ കാർഡുകൾ സ്ക്രീനിൽ റെൻഡർ ചെയ്യുക
+    function renderTeams() {
+        // സെർച്ച് ചെയ്യുന്ന അക്ഷരങ്ങൾ ഉള്ള പ്ലെയർമാരെ മാത്രം ഫിൽട്ടർ ചെയ്യുക
+        const filteredPlayers = players.filter(p => 
+            (p.name || "").toLowerCase().includes(searchQuery)
+        );
+
+        // പേരിന്റെ ആദ്യാക്ഷരം അനുസരിച്ച് അൽഫാബെറ്റിക്കൽ ഓർഡറിൽ അടുക്കുക
+        filteredPlayers.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+
+        // പ്ലെയർമാരെ കണ്ടെത്തിയില്ലെങ്കിൽ
+        if (filteredPlayers.length === 0) {
+            teamsGrid.innerHTML = `<div class="empty">No players found.</div>`;
+            return;
+        }
+
+        // പ്ലെയർ കാർഡുകൾ നിർമ്മിക്കുക
+        teamsGrid.innerHTML = filteredPlayers.map((p) => {
+            // പേരിന്റെ ആദ്യ അക്ഷരം എടുക്കുക
+            const initial = p.name ? p.name.charAt(0).toUpperCase() : "?";
+            
+            // ഒറിജിനൽ ലിസ്റ്റിലെ നമ്പർ കാണിക്കാൻ (PLAYER 01, 02...)
+            const originalIndex = players.findIndex(orig => orig.id === p.id);
+            const playerNum = String(originalIndex + 1).padStart(2, '0');
+
+            return `
+            <div class="team-card">
+                <div class="team-avatar">${initial}</div>
+                <h3>${p.name || 'Unknown'}</h3>
+                <small>ISHRAQ PES PLAYER</small>
+                <div class="team-number">PLAYER ${playerNum}</div>
+            </div>`;
+        }).join("");
+    }
+</script>
+
+</body>
+</html>

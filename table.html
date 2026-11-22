@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>League Table - Ishraq PES</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- അടിസ്ഥാന സ്റ്റൈലുകൾ --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #000000;
+            color: white;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            padding-bottom: 30px;
+            min-height: 100vh;
+            
+            /* ബാക്ക്ഗ്രൗണ്ട് ഇമേജ് */
+            background-image: url('https://res.cloudinary.com/dsfycdl5o/image/upload/v1795253975/Neon_Purple_Stadium_Glow_quidcw.png'); 
+            background-size: cover;
+            background-position: center top;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        /* ടെക്സ്റ്റുകൾ വ്യക്തമായി കാണാൻ ലഘു ഡാർക്ക് ഷേഡ് */
+        .app-container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, rgba(5,1,10,0.3) 0%, rgba(5,1,10,0.8) 100%);
+            z-index: 1;
+        }
+
+        header, .hero-banner, .table-container, .legend-container {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* --- ഹെഡർ --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            position: relative;
+            width: 32px;
+            height: 40px;
+            border: 2.5px solid white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            bottom: 3px;
+            width: 4px;
+            height: 4px;
+            background-color: white;
+            border-radius: 50%;
+        }
+
+        .logo-icon .ball {
+            width: 16px;
+            height: 16px;
+            border: 1.5px solid white;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-icon .ball::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border: 1.5px solid white;
+            transform: rotate(45deg);
+        }
+
+        .logo-text h1 {
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.1;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: #d1d5db;
+            font-weight: 400;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .bell-icon {
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .red-dot {
+            position: absolute;
+            top: -2px;
+            right: 2px;
+            width: 10px;
+            height: 10px;
+            background-color: #d946ef;
+            border-radius: 50%;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        /* --- ബാനർ --- */
+        .hero-banner {
+            width: 100%;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .hero-banner .trophy-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(168,85,247,0.4) 0%, transparent 70%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-banner .title-text {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 2;
+        }
+
+        .hero-banner .cal-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #4c1d95, #a855f7);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+            border: 1px solid #d8b4fe;
+        }
+
+        .hero-banner .title-text h1 {
+            font-size: 34px;
+            font-weight: 700;
+            font-style: italic;
+            line-height: 1;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+
+        .hero-banner .title-text h1 span {
+            color: #d946ef;
+        }
+
+        .hero-banner .title-text p {
+            font-size: 14px;
+            color: #e5e7eb;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        /* --- പോയിന്റ് ടേബിൾ --- */
+        .table-container {
+            margin: 0 15px;
+            background: rgba(15, 5, 25, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid #7e22ce;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(126, 34, 206, 0.4);
+        }
+
+        /* ടേബിൾ ഹെഡർ */
+        .table-header {
+            display: grid;
+            grid-template-columns: 30px 1.5fr 25px 25px 25px 25px 25px 25px 30px 40px;
+            background: rgba(30, 10, 50, 0.9);
+            padding: 12px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #d8b4fe;
+            text-align: center;
+            border-bottom: 1px solid #581c87;
+        }
+
+        .table-header > div:nth-child(2) {
+            text-align: left;
+            padding-left: 10px;
+        }
+
+        /* ടേബിൾ വരികൾ */
+        .table-row {
+            display: grid;
+            grid-template-columns: 30px 1.5fr 25px 25px 25px 25px 25px 25px 30px 40px;
+            align-items: center;
+            padding: 10px 10px;
+            font-size: 12px;
+            text-align: center;
+            border-bottom: 1px solid rgba(88, 28, 135, 0.3);
+            transition: background 0.2s;
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .table-row:hover {
+            background: rgba(88, 28, 135, 0.3);
+        }
+
+        /* റാങ്ക് ബോക്സ് */
+        .rank-box {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+            color: white;
+        }
+
+        .rank-green { background-color: #22c55e; }
+        .rank-gray { background-color: #4b5563; }
+
+        /* ടീം വിവരങ്ങൾ */
+        .team-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-align: left;
+            padding-left: 5px;
+        }
+
+        /* പുതിയ ലോഗോ സ്റ്റൈൽ */
+        .team-logo-img {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1.5px solid #a855f7;
+            flex-shrink: 0;
+            background-color: #1f2937;
+        }
+
+        .team-name {
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 90px;
+        }
+
+        /* പോയിന്റ്സ് ബോക്സ് */
+        .pts-box {
+            background: rgba(88, 28, 135, 0.6);
+            border: 1px solid #a855f7;
+            border-radius: 6px;
+            padding: 4px 0;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+        }
+
+        /* --- താഴെയുള്ള ലെജൻഡ് --- */
+        .legend-container {
+            margin: 20px 15px;
+            padding: 15px;
+            background: rgba(15, 5, 25, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid #581c87;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .color-box {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .box-green { background-color: #22c55e; }
+        .box-gray { background-color: #4b5563; }
+        
+        .loading-text {
+            text-align: center;
+            padding: 20px;
+            color: #d8b4fe;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header>
+            <div class="header-left">
+                <a href="ongoing.html" class="back-btn">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </a>
+                
+                <div class="logo-box">
+                    <div class="logo-icon">
+                        <div class="ball"></div>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Ishraq PES</h1>
+                        <p>Tournament</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="bell-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span class="red-dot"></span>
+                </div>
+                
+                <button class="menu-btn">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Hero Banner (League Table) -->
+        <div class="hero-banner">
+            <div class="title-text">
+                <div class="cal-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="20" x2="12" y2="10"></line>
+                        <line x1="18" y1="20" x2="18" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="16"></line>
+                    </svg>
+                </div>
+                <div>
+                    <h1>League <span>Table</span></h1>
+                    <p>Current Standings</p>
+                </div>
+            </div>
+            
+            <!-- Trophy Graphic -->
+            <div class="trophy-icon">
+                <svg width="100" height="100" viewBox="0 0 24 24" fill="url(#purpleGradient)" stroke="#d8b4fe" stroke-width="1">
+                    <defs>
+                        <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#a855f7;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#4c1d95;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                    <path d="M4 22h16"></path>
+                    <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                    <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+                </svg>
+            </div>
+        </div>
+
+        <!-- League Table -->
+        <div class="table-container">
+            <!-- Table Header -->
+            <div class="table-header">
+                <div>#</div>
+                <div>Team</div>
+                <div>P</div>
+                <div>W</div>
+                <div>D</div>
+                <div>L</div>
+                <div>GF</div>
+                <div>GA</div>
+                <div>GD</div>
+                <div>Pts</div>
+            </div>
+
+            <!-- Dynamic Table Rows Container -->
+            <div id="table-rows">
+                <div class="loading-text">Loading table...</div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend-container">
+            <div class="legend-item">
+                <div class="color-box box-green"></div>
+                Qualify for Knockout
+            </div>
+            <div class="legend-item">
+                <div class="color-box box-gray"></div>
+                Eliminated
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FIREBASE SCRIPT -->
+    <script type="module">
+        import { refs, onSnapshot } from "./firebase.js";
+
+        const tableRowsContainer = document.getElementById("table-rows");
+        let players = [];
+        let matches = [];
+
+        // ലോഗോ ഇല്ലെങ്കിൽ തനിയെ അവതാർ ഉണ്ടാക്കാനുള്ള ഫങ്ക്ഷൻ
+        function getAvatar(name, logo) {
+            if (logo && logo.trim() !== "") return logo;
+            return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=4c1d95&color=fff`;
+        }
+
+        // ഡാറ്റ ലോഡ് ചെയ്യുക (ലോഗോ സഹിതം)
+        onSnapshot(refs.players, snap => {
+            players = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            calculateAndRenderTable();
+        });
+
+        onSnapshot(refs.matches, snap => {
+            matches = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            calculateAndRenderTable();
+        });
+
+        function calculateAndRenderTable() {
+            if (!players.length) {
+                tableRowsContainer.innerHTML = `<div class="loading-text">No players added yet.</div>`;
+                return;
+            }
+
+            // 1. എല്ലാ പ്ലെയർക്കും തുടക്കത്തിൽ 0 പോയിന്റ് നൽകുക
+            const table = players.map(p => ({
+                id: p.id,
+                name: p.name,
+                logo: p.logo, // ലോഗോ ഡാറ്റ ഇവിടെ എടുക്കുന്നു
+                played: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0
+            }));
+
+            const teamMap = {};
+            table.forEach(t => teamMap[t.id] = t);
+
+            // 2. കളിച്ചു തീർന്ന ലീഗ് മാച്ചുകൾ കണക്കാക്കുക
+            const leagueMatches = matches.filter(m => m.stage === "league" && m.played);
+            
+            leagueMatches.forEach(m => {
+                const home = teamMap[m.home];
+                const away = teamMap[m.away];
+                
+                if (!home || !away) return;
+
+                home.played++;
+                away.played++;
+                
+                home.gf += m.hg;
+                home.ga += m.ag;
+                away.gf += m.ag;
+                away.ga += m.hg;
+
+                if (m.hg > m.ag) {
+                    home.w++; home.pts += 3; away.l++;
+                } else if (m.hg < m.ag) {
+                    away.w++; away.pts += 3; home.l++;
+                } else {
+                    home.d++; home.pts += 1;
+                    away.d++; away.pts += 1;
+                }
+            });
+
+            // 3. ഗോൾ ഡിഫറൻസ് കണക്കാക്കുക
+            table.forEach(t => t.gd = t.gf - t.ga);
+
+            // 4. പോയിന്റ്, ഗോൾ ഡിഫറൻസ്, ഗോൾ എന്നിവ അനുസരിച്ച് സോർട്ട് ചെയ്യുക
+            table.sort((a, b) => {
+                if (b.pts !== a.pts) return b.pts - a.pts;
+                if (b.gd !== a.gd) return b.gd - a.gd;
+                if (b.gf !== a.gf) return b.gf - a.gf;
+                return a.name.localeCompare(b.name);
+            });
+
+            // 5. ടേബിൾ HTML റെൻഡർ ചെയ്യുക
+            tableRowsContainer.innerHTML = table.map((t, index) => {
+                const isTop4 = index < 4; // ആദ്യത്തെ 4 ടീമുകൾ ഗ്രീൻ കളർ
+                const rankClass = isTop4 ? 'rank-green' : 'rank-gray';
+
+                // ഗോൾ ഡിഫറൻസ് പോസിറ്റീവ് ആണെങ്കിൽ + ചിഹ്നം നൽകുക
+                const gdDisplay = t.gd > 0 ? `+${t.gd}` : t.gd;
+
+                return `
+                <div class="table-row">
+                    <div><div class="rank-box ${rankClass}">${index + 1}</div></div>
+                    <div class="team-info">
+                        <!-- ഇവിടെയാണ് ലോഗോ ഇമേജ് വരുന്നത് -->
+                        <img src="${getAvatar(t.name, t.logo)}" alt="${t.name}" class="team-logo-img" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=4c1d95&color=fff'">
+                        <span class="team-name">${t.name}</span>
+                    </div>
+                    <div>${t.played}</div>
+                    <div>${t.w}</div>
+                    <div>${t.d}</div>
+                    <div>${t.l}</div>
+                    <div>${t.gf}</div>
+                    <div>${t.ga}</div>
+                    <div>${gdDisplay}</div>
+                    <div><div class="pts-box">${t.pts}</div></div>
+                </div>`;
+            }).join("");
+        }
+    </script>
+</body>
+</html>

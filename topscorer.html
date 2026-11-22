@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Top Scorer - Ishraq PES</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #05010a;
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 430px;
+    min-height: 100vh;
+    overflow: hidden;
+    position: relative;
+    background:
+      linear-gradient(rgba(5,1,15,.55),rgba(5,1,15,.88)),
+      url('https://res.cloudinary.com/dsfycdl5o/image/upload/v1795253975/Neon_Purple_Stadium_Glow_quidcw.png') center top / cover fixed;
+}
+
+/* HEADER */
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 18px;
+    border-bottom: 1px solid #581c87;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.back-btn {
+    color: white;
+    text-decoration: none;
+    font-size: 27px;
+}
+
+.logo-icon {
+    width: 32px;
+    height: 40px;
+    border: 2px solid white;
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 17px;
+}
+
+.logo-text h2 {
+    font-size: 16px;
+    line-height: 1.2;
+}
+
+.logo-text p {
+    font-size: 12px;
+    color: #c4b5fd;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    font-size: 24px;
+}
+
+/* HERO */
+.hero {
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 15px;
+    border-bottom: 2px solid #a855f7;
+    background: linear-gradient(90deg,rgba(15,2,30,.3),rgba(15,2,30,.15));
+}
+
+.hero-text h1 {
+    font-size: 34px;
+    font-weight: 700;
+    font-style: italic;
+    line-height: 1.1;
+}
+
+.hero-text h1 span {
+    color: #d946ef;
+}
+
+.hero-text p {
+    font-size: 12px;
+    margin-top: 8px;
+    color: #e9d5ff;
+}
+
+.boot {
+    font-size: 75px;
+    filter: drop-shadow(0 0 15px #facc15);
+}
+
+/* SUMMARY */
+.summary {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 10px;
+    padding: 15px;
+}
+
+.summary-card {
+    text-align: center;
+    padding: 12px 5px;
+    border: 1px solid #9333ea;
+    border-radius: 12px;
+    background: rgba(35,8,55,.8);
+    box-shadow: 0 0 12px rgba(168,85,247,.25);
+}
+
+.summary-card strong {
+    display: block;
+    color: #e879f9;
+    font-size: 23px;
+}
+
+.summary-card small {
+    font-size: 10px;
+    color: #d8b4fe;
+}
+
+/* SECTION TITLE */
+.section-title {
+    padding: 5px 17px 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section-title h3 {
+    font-size: 17px;
+}
+
+.section-title span {
+    color: #d946ef;
+    font-size: 11px;
+}
+
+/* PLAYER LIST */
+.player-list {
+    padding: 0 15px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.player-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 10px;
+    background: rgba(15,5,30,.88);
+    border: 1px solid #6b21a8;
+    border-radius: 13px;
+    box-shadow: 0 0 10px rgba(147,51,234,.2);
+}
+
+.player-card.first {
+    border: 1.5px solid #eab308;
+    background: linear-gradient(100deg,rgba(113,63,18,.3),rgba(25,5,40,.95));
+    box-shadow: 0 0 15px rgba(234,179,8,.2);
+}
+
+.rank {
+    width: 27px;
+    height: 27px;
+    flex-shrink: 0;
+    border-radius: 7px;
+    background: #6b21a8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.first .rank {
+    background: #eab308;
+    color: #190d00;
+}
+
+.avatar {
+    width: 43px;
+    height: 43px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg,#9333ea,#3b0764);
+    border: 1px solid #d8b4fe;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 19px;
+}
+
+.player-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.player-info h4 {
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.player-info p {
+    font-size: 10px;
+    color: #c4b5fd;
+    margin-top: 3px;
+}
+
+.goal-box {
+    text-align: center;
+    min-width: 48px;
+}
+
+.goal-box strong {
+    display: block;
+    font-size: 23px;
+    color: #e879f9;
+}
+
+.first .goal-box strong {
+    color: #facc15;
+}
+
+.goal-box small {
+    font-size: 9px;
+    color: #d8b4fe;
+}
+
+.stats {
+    text-align: right;
+    min-width: 42px;
+}
+
+.stats strong {
+    display: block;
+    font-size: 12px;
+}
+
+.stats small {
+    color: #a78bfa;
+    font-size: 9px;
+}
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    padding: 20px;
+    color: #9ca3af;
+    font-size: 10px;
+    border-top: 1px solid #581c87;
+}
+
+.loading-text {
+    text-align: center;
+    padding: 20px;
+    color: #d8b4fe;
+    font-size: 13px;
+}
+
+@media(max-width:350px) {
+    .hero-text h1 {
+        font-size: 28px;
+    }
+    .boot {
+        font-size: 55px;
+    }
+    .player-card {
+        gap: 7px;
+        padding: 10px 7px;
+    }
+    .player-info h4 {
+        font-size: 11px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app-container">
+
+<header>
+    <div class="header-left">
+        <a href="ongoing.html" class="back-btn">‹</a>
+        <div class="logo-icon">⚽</div>
+        <div class="logo-text">
+            <h2>Ishraq PES</h2>
+            <p>Tournament</p>
+        </div>
+    </div>
+
+    <div class="header-right">
+        <span>♧</span>
+        <span>☰</span>
+    </div>
+</header>
+
+<!-- HERO BANNER -->
+<section class="hero">
+    <div class="hero-text">
+        <h1>Top <span>Scorer</span></h1>
+        <p>Golden Boot • Current Season</p>
+    </div>
+    <div class="boot">👟</div>
+</section>
+
+<!-- SUMMARY -->
+<section class="summary">
+    <div class="summary-card">
+        <strong id="totalGoals">0</strong>
+        <small>Total Goals</small>
+    </div>
+    <div class="summary-card">
+        <strong id="totalPlayers">0</strong>
+        <small>Players</small>
+    </div>
+    <div class="summary-card">
+        <strong id="highestGoals">0</strong>
+        <small>Highest Goals</small>
+    </div>
+</section>
+
+<!-- PLAYER RANKINGS -->
+<div class="section-title">
+    <h3>🏆 Top Scorer Rankings</h3>
+    <span>GOALS ↓</span>
+</div>
+
+<section class="player-list" id="playerList">
+    <div class="loading-text">Loading rankings...</div>
+</section>
+
+<div class="footer">
+    ISHRAQ PES TOURNAMENT • TOP SCORER
+</div>
+
+</div>
+
+<!-- FIREBASE SCRIPT -->
+<script type="module">
+    import { refs, onSnapshot } from "./firebase.js";
+
+    const playerListContainer = document.getElementById("playerList");
+    let players = [];
+    let matches = [];
+
+    // ലൈവ് ഡാറ്റ ലോഡ് ചെയ്യുക
+    onSnapshot(refs.players, snap => {
+        players = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        calculateAndRender();
+    });
+
+    onSnapshot(refs.matches, snap => {
+        matches = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        calculateAndRender();
+    });
+
+    function calculateAndRender() {
+        if (!players.length) {
+            playerListContainer.innerHTML = `<div class="loading-text">No players added yet.</div>`;
+            return;
+        }
+
+        // കളിച്ചു തീർന്ന എല്ലാ മാച്ചുകളും എടുക്കുക (ലീഗ് + നോക്കൗട്ട്)
+        const playedMatches = matches.filter(m => m.played);
+
+        // ഓരോ പ്ലെയർക്കും ഗോളും അസിസ്റ്റും കണക്കാക്കുക
+        const playerStats = players.map(p => {
+            let goals = 0;
+            
+            playedMatches.forEach(m => {
+                if (m.home === p.id) goals += Number(m.hg) || 0;
+                if (m.away === p.id) goals += Number(m.ag) || 0;
+            });
+
+            return {
+                id: p.id,
+                name: p.name,
+                goals: goals,
+                assists: p.assists || 0 // അഡ്മിൻ നൽകുന്ന അസിസ്റ്റുകൾ
+            };
+        });
+
+        // ഗോളുകൾ അനുസരിച്ചും, എണ്ണം തുല്യമെങ്കിൽ അസിസ്റ്റുകൾ അനുസരിച്ചും സോർട്ട് ചെയ്യുക
+        playerStats.sort((a, b) => {
+            if (b.goals !== a.goals) return b.goals - a.goals;
+            if (b.assists !== a.assists) return b.assists - a.assists;
+            return a.name.localeCompare(b.name);
+        });
+
+        // സമ്മറി കാർഡുകൾ അപ്ഡേറ്റ് ചെയ്യുക
+        const totalGoals = playerStats.reduce((sum, p) => sum + p.goals, 0);
+        const highestGoals = playerStats.length > 0 ? Math.max(...playerStats.map(p => p.goals)) : 0;
+        
+        document.getElementById('totalGoals').textContent = totalGoals;
+        document.getElementById('totalPlayers').textContent = playerStats.length;
+        document.getElementById('highestGoals').textContent = highestGoals;
+
+        // ലിസ്റ്റ് റെൻഡർ ചെയ്യുക
+        playerListContainer.innerHTML = playerStats.map((p, index) => {
+            const isFirst = index === 0;
+            const cardClass = isFirst ? 'player-card first' : 'player-card';
+            const avatar = isFirst ? '👑' : '⚽';
+
+            return `
+            <div class="${cardClass}">
+                <div class="rank">${index + 1}</div>
+                <div class="avatar">${avatar}</div>
+                <div class="player-info">
+                    <h4>${p.name}</h4>
+                    <p>Player</p>
+                </div>
+                <div class="goal-box">
+                    <strong>${p.goals}</strong>
+                    <small>GOALS</small>
+                </div>
+                <div class="stats">
+                    <strong>${p.assists}</strong>
+                    <small>ASSISTS</small>
+                </div>
+            </div>`;
+        }).join("");
+    }
+</script>
+
+</body>
+</html>

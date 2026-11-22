@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tournament Info | Ishraq PES Tournament</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    color: white;
+    min-height: 100vh;
+    background:
+        linear-gradient(rgba(12,5,28,.88),rgba(12,5,28,.97)),
+        url("https://res.cloudinary.com/dsfycdl5o/image/upload/v1795253975/Neon_Purple_Stadium_Glow_quidcw.png") center/cover fixed;
+    padding: 18px 14px 35px;
+}
+
+.container {
+    max-width: 430px;
+    margin: auto;
+}
+
+.back {
+    display: inline-block;
+    color: #d8b5ff;
+    text-decoration: none;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.hero {
+    text-align: center;
+    padding: 30px 15px;
+    border: 1px solid #873cff;
+    border-radius: 18px;
+    background: linear-gradient(135deg,#35105f,#170b30);
+    box-shadow: 0 0 22px #782cff55;
+    margin-bottom: 20px;
+}
+
+.hero .icon {
+    font-size: 45px;
+}
+
+.hero h1 {
+    font-size: 24px;
+    margin: 10px 0 7px;
+    color: #e6caff;
+}
+
+.hero p {
+    font-size: 12px;
+    color: #c7b5df;
+}
+
+.status {
+    display: inline-block;
+    margin-top: 13px;
+    padding: 7px 14px;
+    border-radius: 20px;
+    background: #174c36;
+    color: #7fffc0;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.section {
+    background: linear-gradient(135deg,#291443,#180d2a);
+    border: 1px solid #593080;
+    border-radius: 14px;
+    padding: 17px;
+    margin-bottom: 14px;
+}
+
+.section h2 {
+    color: #e5caff;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 11px 0;
+    border-bottom: 1px solid #ffffff12;
+    font-size: 13px;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.info-row span:first-child {
+    color: #b49acb;
+    flex-shrink: 0;
+}
+
+.info-row span:last-child {
+    color: #f0e3ff;
+    font-weight: bold;
+    text-align: right;
+}
+
+.rules {
+    list-style: none;
+}
+
+.rules li {
+    position: relative;
+    padding: 9px 0 9px 23px;
+    color: #d7c7e9;
+    font-size: 13px;
+    line-height: 1.5;
+    border-bottom: 1px solid #ffffff10;
+}
+
+.rules li:last-child {
+    border-bottom: none;
+}
+
+.rules li::before {
+    content: "✦";
+    position: absolute;
+    left: 0;
+    color: #c18aff;
+}
+
+.points {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 9px;
+}
+
+.point-card {
+    text-align: center;
+    padding: 14px 5px;
+    border-radius: 11px;
+    background: #32184f;
+    border: 1px solid #7543a7;
+}
+
+.point-card strong {
+    display: block;
+    font-size: 23px;
+    color: #d9aaff;
+    margin-bottom: 5px;
+}
+
+.point-card small {
+    color: #c3acd9;
+    font-size: 10px;
+}
+
+.footer {
+    text-align: center;
+    color: #907ba9;
+    font-size: 11px;
+    margin-top: 23px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<a href="ongoing.html" class="back">← Back to Dashboard</a>
+
+<div class="hero">
+    <div class="icon">🏆</div>
+    <h1>TOURNAMENT INFO</h1>
+    <p>Everything you need to know about the tournament</p>
+    <div class="status">● LIVE TOURNAMENT</div>
+</div>
+
+<div class="section">
+    <h2>📋 General Information</h2>
+
+    <div class="info-row">
+        <span>Tournament Name</span>
+        <span id="infoName">Loading...</span>
+    </div>
+
+    <div class="info-row">
+        <span>Game</span>
+        <span id="infoGame">Loading...</span>
+    </div>
+
+    <div class="info-row">
+        <span>Season</span>
+        <span>Current Season</span>
+    </div>
+
+    <div class="info-row">
+        <span>Total Participants</span>
+        <span id="infoPlayers">0 Players</span>
+    </div>
+
+    <div class="info-row">
+        <span>Platform</span>
+        <span>Android / iOS</span>
+    </div>
+</div>
+
+<div class="section">
+    <h2>⚽ Tournament Format</h2>
+    <ul class="rules" id="infoFormatList">
+        <!-- ലോഡിംഗ് സമയത്ത് ഡീഫോൾട്ട് കാണിക്കുന്നത് -->
+        <li>Loading tournament format...</li>
+    </ul>
+</div>
+
+<div class="section">
+    <h2>📊 Points System</h2>
+
+    <div class="points">
+        <div class="point-card">
+            <strong>3</strong>
+            <small>WIN</small>
+        </div>
+
+        <div class="point-card">
+            <strong>1</strong>
+            <small>DRAW</small>
+        </div>
+
+        <div class="point-card">
+            <strong>0</strong>
+            <small>LOSS</small>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2>📜 Match Rules</h2>
+
+    <ul class="rules">
+        <li>Players must complete their matches within the given deadline.</li>
+        <li>Both players should confirm the final match result.</li>
+        <li>Players should submit valid match screenshots when requested.</li>
+        <li>Any dispute should be reported to the tournament admin.</li>
+        <li>Unfair play or cheating may lead to disqualification.</li>
+    </ul>
+</div>
+
+<div class="section">
+    <h2>🏅 Awards & Achievements</h2>
+
+    <ul class="rules">
+        <li>Top Scorer – Highest goals scored by a player.</li>
+        <li>Best GK – Best goalkeeper performance.</li>
+        <li>Golden Ball – Best overall player.</li>
+        <li>Most Goals Scored – Highest scoring team.</li>
+        <li>Most Goals Conceded – Team that conceded the most goals.</li>
+    </ul>
+</div>
+
+<div class="section">
+    <h2>📞 Tournament Support</h2>
+
+    <div class="info-row">
+        <span>Organizer</span>
+        <span>Ishraq PES Tournament</span>
+    </div>
+
+    <div class="info-row">
+        <span>Contact</span>
+        <span>Contact Tournament Admin</span>
+    </div>
+</div>
+
+<p class="footer">ISHRAQ PES TOURNAMENT</p>
+
+</div>
+
+<!-- FIREBASE SCRIPT -->
+<script type="module">
+    import { refs, onSnapshot } from "./firebase.js";
+
+    const infoName = document.getElementById("infoName");
+    const infoGame = document.getElementById("infoGame");
+    const infoPlayers = document.getElementById("infoPlayers");
+    const infoFormatList = document.getElementById("infoFormatList");
+
+    // 1. പ്ലെയർമാരുടെ എണ്ണം ലൈവ് ആയി കാണിക്കുക
+    onSnapshot(refs.players, snap => {
+        const count = snap.size;
+        infoPlayers.textContent = `${count} Player${count !== 1 ? 's' : ''}`;
+    });
+
+    // 2. ടൂർണമെന്റ് വിവരങ്ങൾ ലൈവ് ആയി കാണിക്കുക
+    onSnapshot(refs.tournament, snap => {
+        if (snap.exists()) {
+            const data = snap.data();
+            
+            // പേരും ഗെയിമും അപ്ഡേറ്റ് ചെയ്യുക
+            infoName.textContent = data.name || "Ishraq PES Tournament";
+            infoGame.textContent = data.game || "eFootball Mobile";
+
+            // ഫോർമാറ്റ് ലിസ്റ്റ് അപ്ഡേറ്റ് ചെയ്യുക
+            // അഡ്മിൻ "format" എന്നതിൽ നൽകുന്ന വാചകവും "rules" എന്നതിൽ നൽകുന്ന വാചകവും ഇവിടെ കാണിക്കും
+            let formatHTML = "";
+            
+            if (data.format) {
+                formatHTML += `<li>${data.format}</li>`;
+            }
+            if (data.rules) {
+                // റൂൾസിൽ എന്റർ അടിച്ചിട്ടുണ്ടെങ്കിൽ അത് വേർതിരിച്ച് കാണിക്കാൻ
+                const ruleLines = data.rules.split('\n').filter(line => line.trim() !== '');
+                ruleLines.forEach(rule => {
+                    formatHTML += `<li>${rule}</li>`;
+                });
+            }
+
+            if (formatHTML !== "") {
+                infoFormatList.innerHTML = formatHTML;
+            } else {
+                // അഡ്മിൻ ഒന്നും നൽകിയിട്ടില്ലെങ്കിൽ ഡീഫോൾട്ട് കാണിക്കുക
+                infoFormatList.innerHTML = `
+                    <li>All registered participants compete in the tournament.</li>
+                    <li>Fixtures determine the match opponents.</li>
+                    <li>Match results are used to update the league table.</li>
+                    <li>The final winner is determined according to the tournament format.</li>
+                `;
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

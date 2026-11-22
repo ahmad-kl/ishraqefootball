@@ -1,0 +1,383 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Most Goals Scored | Ishraq PES Tournament</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    color: white;
+    min-height: 100vh;
+    background:
+        linear-gradient(rgba(12,5,28,.88),rgba(12,5,28,.96)),
+        url("https://res.cloudinary.com/dsfycdl5o/image/upload/v1795253975/Neon_Purple_Stadium_Glow_quidcw.png") center/cover fixed;
+    padding: 18px 14px 35px;
+}
+
+.container {
+    max-width: 430px;
+    margin: auto;
+}
+
+.back {
+    display: inline-block;
+    color: #d8b5ff;
+    text-decoration: none;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.hero {
+    text-align: center;
+    padding: 28px 15px;
+    border: 1px solid #873cff;
+    border-radius: 18px;
+    background: linear-gradient(135deg,#35105f,#170b30);
+    box-shadow: 0 0 22px #782cff55;
+    margin-bottom: 22px;
+}
+
+.hero .icon {
+    font-size: 42px;
+}
+
+.hero h1 {
+    font-size: 24px;
+    margin: 10px 0 7px;
+    color: #e6caff;
+}
+
+.hero p {
+    font-size: 12px;
+    color: #c7b5df;
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.stat {
+    background: #211139;
+    border: 1px solid #6230a0;
+    border-radius: 13px;
+    padding: 15px;
+    text-align: center;
+}
+
+.stat span {
+    display: block;
+    color: #bba3d9;
+    font-size: 11px;
+    margin-bottom: 7px;
+}
+
+.stat strong {
+    font-size: 23px;
+    color: #d9aaff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    padding: 0 5px;
+}
+
+.section-title {
+    font-size: 16px;
+    margin-bottom: 13px;
+    color: #e5caff;
+}
+
+.team-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(110deg,#291443,#180d2a);
+    border: 1px solid #593080;
+    border-radius: 13px;
+    padding: 14px;
+    margin-bottom: 11px;
+}
+
+.rank {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    background: #49206f;
+    font-weight: bold;
+    color: #e8ccff;
+}
+
+/* TOP RANK */
+.team-card:first-child .rank {
+    background: #facc15;
+    color: #190d00;
+}
+
+/* PLAYER LOGO */
+.avatar {
+    width: 45px;
+    height: 45px;
+    flex: 0 0 45px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #d8b4fe;
+    background: #1f1230;
+    box-shadow: 0 0 10px rgba(168,85,247,0.5);
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.team-card:first-child .avatar {
+    border-color: #facc15;
+}
+
+.team-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.team-info h3 {
+    font-size: 14px;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.team-info small {
+    font-size: 11px;
+    color: #ad99c5;
+}
+
+.goals {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.goals strong {
+    display: block;
+    font-size: 21px;
+    color: #d7a0ff;
+}
+
+.goals small {
+    color: #ad99c5;
+    font-size: 10px;
+}
+
+.note {
+    text-align: center;
+    color: #907ba9;
+    font-size: 11px;
+    margin-top: 22px;
+}
+
+.loading-text {
+    text-align: center;
+    color: #bba3d9;
+    padding: 20px;
+    font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<a href="ongoing.html" class="back">← Back to Dashboard</a>
+
+<div class="hero">
+    <div class="icon">⚽</div>
+    <h1>MOST GOALS SCORED</h1>
+    <p>Highest scoring teams in the tournament</p>
+</div>
+
+<div class="summary">
+    <div class="stat">
+        <span>TOTAL GOALS</span>
+        <strong id="totalGoals">0</strong>
+    </div>
+    <div class="stat">
+        <span>TOP TEAM</span>
+        <strong id="topTeam">--</strong>
+    </div>
+</div>
+
+<h2 class="section-title">🏆 Goals Ranking</h2>
+
+<div id="ranking">
+    <div class="loading-text">Loading data...</div>
+</div>
+
+<p class="note">ISHRAQ PES TOURNAMENT</p>
+
+</div>
+
+<!-- FIREBASE SCRIPT -->
+<script type="module">
+import { refs, onSnapshot } from "./firebase.js";
+
+const rankingContainer = document.getElementById("ranking");
+
+let players = [];
+let matches = [];
+
+// ESCAPE HTML
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+// LIVE PLAYER UPDATES
+onSnapshot(refs.players, snap => {
+
+    players = snap.docs.map(d => ({
+        id: d.id,
+        ...d.data()
+    }));
+
+    calculateAndRender();
+
+}, error => {
+    console.error("Players listener error:", error);
+    rankingContainer.innerHTML = `
+        <div class="loading-text">Unable to load players.</div>
+    `;
+});
+
+// LIVE MATCH UPDATES
+onSnapshot(refs.matches, snap => {
+
+    matches = snap.docs.map(d => ({
+        id: d.id,
+        ...d.data()
+    }));
+
+    calculateAndRender();
+
+}, error => {
+    console.error("Matches listener error:", error);
+    rankingContainer.innerHTML = `
+        <div class="loading-text">Unable to load matches.</div>
+    `;
+});
+
+// CALCULATE AND RENDER
+function calculateAndRender() {
+
+    if (!players.length) {
+        rankingContainer.innerHTML = `
+            <div class="loading-text">No players added yet.</div>
+        `;
+        return;
+    }
+
+    const playedMatches = matches.filter(m => m.played);
+
+    let totalGoalsScored = 0;
+
+    // PLAYER GOAL CALCULATION
+    const playerStats = players.map(p => {
+
+        let scored = 0;
+
+        playedMatches.forEach(m => {
+
+            if (m.home === p.id) {
+                scored += Number(m.hg) || 0;
+            }
+
+            if (m.away === p.id) {
+                scored += Number(m.ag) || 0;
+            }
+
+        });
+
+        totalGoalsScored += scored;
+
+        return {
+            id: p.id,
+            name: p.name,
+            logo: p.logo,
+            scored: scored
+        };
+
+    });
+
+    // SORT BY MOST GOALS
+    playerStats.sort((a, b) => b.scored - a.scored);
+
+    // UPDATE SUMMARY
+    document.getElementById("totalGoals").textContent =
+        totalGoalsScored;
+
+    document.getElementById("topTeam").textContent =
+        playerStats.length > 0 ? playerStats[0].name : "--";
+
+    // RENDER RANKING
+    rankingContainer.innerHTML = playerStats.map((p, index) => {
+
+        const logoUrl = p.logo ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name || "Player")}&background=4c1d95&color=fff`;
+
+        return `
+        <div class="team-card">
+
+            <div class="rank">
+                ${index + 1}
+            </div>
+
+            <div class="avatar">
+                <img
+                    src="${escapeHTML(logoUrl)}"
+                    alt="${escapeHTML(p.name)}"
+                    loading="lazy"
+                    onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=Player&background=4c1d95&color=fff';"
+                >
+            </div>
+
+            <div class="team-info">
+                <h3>${escapeHTML(p.name)}</h3>
+                <small>Team Performance</small>
+            </div>
+
+            <div class="goals">
+                <strong>${p.scored}</strong>
+                <small>GOALS</small>
+            </div>
+
+        </div>`;
+
+    }).join("");
+
+}
+
+</script>
+
+</body>
+</html>
