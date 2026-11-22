@@ -108,6 +108,7 @@ body {
     color: #f0e3ff;
     font-weight: bold;
     text-align: right;
+    overflow-wrap: anywhere;
 }
 
 .rules {
@@ -178,7 +179,7 @@ body {
     <div class="icon">🏆</div>
     <h1>TOURNAMENT INFO</h1>
     <p>Everything you need to know about the tournament</p>
-    <div class="status">● LIVE TOURNAMENT</div>
+    <div class="status" id="infoStatus">● LIVE TOURNAMENT</div>
 </div>
 
 <div class="section">
@@ -196,7 +197,7 @@ body {
 
     <div class="info-row">
         <span>Season</span>
-        <span>Current Season</span>
+        <span id="infoSeason">Current Season</span>
     </div>
 
     <div class="info-row">
@@ -206,14 +207,13 @@ body {
 
     <div class="info-row">
         <span>Platform</span>
-        <span>Android / iOS</span>
+        <span id="infoPlatform">Android / iOS</span>
     </div>
 </div>
 
 <div class="section">
     <h2>⚽ Tournament Format</h2>
     <ul class="rules" id="infoFormatList">
-        <!-- ലോഡിംഗ് സമയത്ത് ഡീഫോൾട്ട് കാണിക്കുന്നത് -->
         <li>Loading tournament format...</li>
     </ul>
 </div>
@@ -223,17 +223,17 @@ body {
 
     <div class="points">
         <div class="point-card">
-            <strong>3</strong>
+            <strong id="pointsWin">3</strong>
             <small>WIN</small>
         </div>
 
         <div class="point-card">
-            <strong>1</strong>
+            <strong id="pointsDraw">1</strong>
             <small>DRAW</small>
         </div>
 
         <div class="point-card">
-            <strong>0</strong>
+            <strong id="pointsLoss">0</strong>
             <small>LOSS</small>
         </div>
     </div>
@@ -241,25 +241,15 @@ body {
 
 <div class="section">
     <h2>📜 Match Rules</h2>
-
-    <ul class="rules">
-        <li>Players must complete their matches within the given deadline.</li>
-        <li>Both players should confirm the final match result.</li>
-        <li>Players should submit valid match screenshots when requested.</li>
-        <li>Any dispute should be reported to the tournament admin.</li>
-        <li>Unfair play or cheating may lead to disqualification.</li>
+    <ul class="rules" id="infoMatchRules">
+        <li>Loading match rules...</li>
     </ul>
 </div>
 
 <div class="section">
     <h2>🏅 Awards & Achievements</h2>
-
-    <ul class="rules">
-        <li>Top Scorer – Highest goals scored by a player.</li>
-        <li>Best GK – Best goalkeeper performance.</li>
-        <li>Golden Ball – Best overall player.</li>
-        <li>Most Goals Scored – Highest scoring team.</li>
-        <li>Most Goals Conceded – Team that conceded the most goals.</li>
+    <ul class="rules" id="infoAchievements">
+        <li>Loading awards & achievements...</li>
     </ul>
 </div>
 
@@ -268,12 +258,12 @@ body {
 
     <div class="info-row">
         <span>Organizer</span>
-        <span>Ishraq PES Tournament</span>
+        <span id="infoOrganizer">Ishraq PES Tournament</span>
     </div>
 
     <div class="info-row">
         <span>Contact</span>
-        <span>Contact Tournament Admin</span>
+        <span id="infoContact">Contact Tournament Admin</span>
     </div>
 </div>
 
@@ -283,56 +273,95 @@ body {
 
 <!-- FIREBASE SCRIPT -->
 <script type="module">
-    import { refs, onSnapshot } from "./firebase.js";
+import { refs, onSnapshot } from "./firebase.js";
 
-    const infoName = document.getElementById("infoName");
-    const infoGame = document.getElementById("infoGame");
-    const infoPlayers = document.getElementById("infoPlayers");
-    const infoFormatList = document.getElementById("infoFormatList");
+const byId = id => document.getElementById(id);
 
-    // 1. പ്ലെയർമാരുടെ എണ്ണം ലൈവ് ആയി കാണിക്കുക
-    onSnapshot(refs.players, snap => {
-        const count = snap.size;
-        infoPlayers.textContent = `${count} Player${count !== 1 ? 's' : ''}`;
+const setText = (id, value, fallback = "") => {
+    byId(id).textContent = value || fallback;
+};
+
+// Newline-separated text into safe list items
+function renderList(elementId, text, fallbackItems) {
+    const list = byId(elementId);
+    list.replaceChildren();
+
+    const items = String(text || "")
+        .split("\n")
+        .map(line => line.trim())
+        .filter(Boolean);
+
+    (items.length ? items : fallbackItems).forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        list.appendChild(li);
     });
+}
 
-    // 2. ടൂർണമെന്റ് വിവരങ്ങൾ ലൈവ് ആയി കാണിക്കുക
-    onSnapshot(refs.tournament, snap => {
-        if (snap.exists()) {
-            const data = snap.data();
-            
-            // പേരും ഗെയിമും അപ്ഡേറ്റ് ചെയ്യുക
-            infoName.textContent = data.name || "Ishraq PES Tournament";
-            infoGame.textContent = data.game || "eFootball Mobile";
+// Live player count
+onSnapshot(refs.players, snap => {
+    const count = snap.size;
+    setText(
+        "infoPlayers",
+        `${count} Player${count !== 1 ? "s" : ""}`
+    );
+}, error => {
+    console.error("Players listener:", error);
+});
 
-            // ഫോർമാറ്റ് ലിസ്റ്റ് അപ്ഡേറ്റ് ചെയ്യുക
-            // അഡ്മിൻ "format" എന്നതിൽ നൽകുന്ന വാചകവും "rules" എന്നതിൽ നൽകുന്ന വാചകവും ഇവിടെ കാണിക്കും
-            let formatHTML = "";
-            
-            if (data.format) {
-                formatHTML += `<li>${data.format}</li>`;
-            }
-            if (data.rules) {
-                // റൂൾസിൽ എന്റർ അടിച്ചിട്ടുണ്ടെങ്കിൽ അത് വേർതിരിച്ച് കാണിക്കാൻ
-                const ruleLines = data.rules.split('\n').filter(line => line.trim() !== '');
-                ruleLines.forEach(rule => {
-                    formatHTML += `<li>${rule}</li>`;
-                });
-            }
+// All tournament information from Admin Panel
+onSnapshot(refs.tournament, snap => {
+    const data = snap.exists() ? snap.data() : {};
 
-            if (formatHTML !== "") {
-                infoFormatList.innerHTML = formatHTML;
-            } else {
-                // അഡ്മിൻ ഒന്നും നൽകിയിട്ടില്ലെങ്കിൽ ഡീഫോൾട്ട് കാണിക്കുക
-                infoFormatList.innerHTML = `
-                    <li>All registered participants compete in the tournament.</li>
-                    <li>Fixtures determine the match opponents.</li>
-                    <li>Match results are used to update the league table.</li>
-                    <li>The final winner is determined according to the tournament format.</li>
-                `;
-            }
-        }
-    });
+    // General Information
+    setText("infoName", data.name, "Ishraq PES Tournament");
+    setText("infoGame", data.game, "eFootball Mobile");
+    setText("infoSeason", data.season, "Current Season");
+    setText("infoPlatform", data.platform, "Android / iOS");
+    setText("infoStatus", "● " + (data.status || "LIVE TOURNAMENT"));
+
+    // Tournament Support
+    setText("infoOrganizer", data.organizer, "Ishraq PES Tournament");
+    setText("infoContact", data.contact, "Contact Tournament Admin");
+
+    // Tournament Format
+    renderList("infoFormatList", data.format, [
+        "Single Round Robin",
+        "Top 4 qualify for semi-finals",
+        "Winners advance to the final"
+    ]);
+
+    // Points System
+    byId("pointsWin").textContent =
+        data.pointsWin !== undefined ? data.pointsWin : 3;
+
+    byId("pointsDraw").textContent =
+        data.pointsDraw !== undefined ? data.pointsDraw : 1;
+
+    byId("pointsLoss").textContent =
+        data.pointsLoss !== undefined ? data.pointsLoss : 0;
+
+    // Match Rules
+    renderList("infoMatchRules", data.matchRules, [
+        "Players must complete their matches within the given deadline.",
+        "Both players should confirm the final match result.",
+        "Players should submit valid match screenshots when requested.",
+        "Any dispute should be reported to the tournament admin.",
+        "Unfair play or cheating may lead to disqualification."
+    ]);
+
+    // Awards & Achievements
+    renderList("infoAchievements", data.achievements, [
+        "Top Scorer – Highest goals scored by a player.",
+        "Best GK – Best goalkeeper performance.",
+        "Golden Ball – Best overall player.",
+        "Most Goals Scored – Highest scoring team.",
+        "Most Goals Conceded – Team that conceded the most goals."
+    ]);
+
+}, error => {
+    console.error("Tournament info listener:", error);
+});
 </script>
 
 </body>
